@@ -15,7 +15,7 @@ Plug 'nvim-telescope/telescope-fzy-native.nvim'
 Plug 'colepeters/spacemacs-theme.vim'
 
 " Autocomplete
-Plug 'Valloric/YouCompleteMe'
+"Plug 'Valloric/YouCompleteMe'
 
 " More stuff
 Plug 'vim-airline/vim-airline'
