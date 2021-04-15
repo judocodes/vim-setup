@@ -2,6 +2,7 @@ call plug#begin('~/.vim/plugged')
 
 " LSP
 Plug 'neovim/nvim-lspconfig'
+Plug 'hrsh7th/compe'
 " LSPInstall 
 " tsserver
 
@@ -51,6 +52,8 @@ Plug 'NLKNguyen/papercolor-theme'
 Plug 'ayu-theme/ayu-vim'
 Plug 'sonph/onehalf', {'rtp': 'vim'}
 
+" Prettier
+Plug 'sbdchd/neoformat' 
 
 call plug#end()
 
@@ -345,16 +348,25 @@ nnoremap <leader>ph :lua require('telescope.builtin').help_tags()<CR>
 " CoC remaps
 
 " edit snippets
-nmap <leader>sn :CocCommand snippets.editSnippets<CR>
+"nmap <leader>sn :CocCommand snippets.editSnippets<CR>
 " go to definition
-nmap <silent> <leader>gd <Plug>(coc-definition)
+"nmap <silent> <leader>gd <Plug>(coc-definition)
 " go to type definition
-nmap <silent> <leader>gt <Plug>(coc-type-definition)
+"nmap <silent> <leader>gt <Plug>(coc-type-definition)
 " go to implementation
-nmap <silent> <leader>gi <Plug>(coc-implementation)
+"nmap <silent> <leader>gi <Plug>(coc-implementation)
 " go to references
-nmap <silent> <leader>gr <Plug>(coc-references)
+"nmap <silent> <leader>gr <Plug>(coc-references)
 
+" LSP remaps
+nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<CR>
+nnoremap <silent> gD <cmd>lua vim.lsp.buf.declaration()<CR>
+nnoremap <silent> gr <cmd>lua vim.lsp.buf.references()<CR>
+nnoremap <silent> gi <cmd>lua vim.lsp.buf.implementation()<CR>
+nnoremap <silent> K <cmd>lua vim.lsp.buf.hover()<CR>
+nnoremap <silent> <C-k> <cmd>lua vim.lsp.buf.signature_help()<CR>
+nnoremap <silent> <C-n> <cmd>lua vim.lsp.diagnostic.goto_prev()<CR>
+nnoremap <silent> <C-p> <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
 
 
 " NerdTree
@@ -471,8 +483,11 @@ augroup END
 
 
 
-
-
+" Prettier
+autocmd BufWritePre *.js lua vim.lsp.buf.formatting_sync(nil, 100)
+autocmd BufWritePre *.vue lua vim.lsp.buf.formatting_sync(nil, 100)
+autocmd BufWritePre *.jsx lua vim.lsp.buf.formatting_sync(nil, 100)
+autocmd BufWritePre *.py lua vim.lsp.buf.formatting_sync(nil, 100)
 
 
 
