@@ -1,9 +1,7 @@
 call plug#begin('~/.vim/plugged')
 
-" LSP
-Plug 'neovim/nvim-lspconfig'
-" LSPInstall 
-" tsserver
+" COC
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 " Debugging
 Plug 'puremourning/vimspector'
@@ -17,7 +15,7 @@ Plug 'nvim-telescope/telescope-fzy-native.nvim'
 Plug 'colepeters/spacemacs-theme.vim'
 
 " Autocomplete
-" Plug 'Valloric/YouCompleteMe'
+Plug 'Valloric/YouCompleteMe'
 
 " More stuff
 Plug 'vim-airline/vim-airline'
@@ -81,6 +79,20 @@ fun! GotoWindow(id)
   call win_gotoid(a:id)
 endfun
 
+" coc config
+let g:coc_global_extensions = [
+ \ 'coc-snippets',
+ \ 'coc-pairs',
+ \ 'coc-tsserver',
+ \ 'coc-eslint',
+ \ 'coc-prettier',
+ \ 'coc-json',
+ \ 'coc-yaml',
+ \ 'coc-styled-components',
+ \ 'coc-vetur',
+ \ ]
+" :CocCommand snippets.editSnippets
+
 " prettier
 " command! Prettier CocCommand prettier.formatFile 
 
@@ -112,16 +124,6 @@ endfunc
 " show highlight group
 nmap <leader>hlg :call <SID>SynStack()<CR>
 
-" LSP Config
-lua << EOF
-  require'lspconfig'.tsserver.setup{}
-  require'lspconfig'.vuels.setup{}
-  require'lspconfig'.html.setup{}
-  require'lspconfig'.graphql.setup{}
-  require'lspconfig'.dockerls.setup{}
-  require'lspconfig'.cssls.setup{}
-  require'lspconfig'.jsonls.setup{}
-EOF
 
 
 
