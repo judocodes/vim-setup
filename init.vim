@@ -49,6 +49,11 @@ Plug 'NLKNguyen/papercolor-theme'
 Plug 'ayu-theme/ayu-vim'
 Plug 'sonph/onehalf', {'rtp': 'vim'}
 
+" JSDOC
+Plug 'heavenshell/vim-jsdoc', {
+  \ 'for': ['javascript', 'javascript.jsx', 'typescript'] ,
+  \ 'do': 'make install'
+\}
 
 call plug#end()
 
@@ -394,7 +399,7 @@ nnoremap <leader>csl :call LightScheme()<CR>
 " Git
 nnoremap <leader>gf :diffget //2<CR>
 nnoremap <leader>gj :diffget //3<CR>
-nnoremap <leader>gs :G<CR>
+nnoremap <leader>gs :G<CR>5j
 nnoremap <leader>ga :G add
 nnoremap <leader>gc :G commit -m "
 nnoremap <leader>gp :G push 
