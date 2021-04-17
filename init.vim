@@ -1,66 +1,15 @@
-call plug#begin('~/.vim/plugged')
-
-" LSP
-Plug 'neovim/nvim-lspconfig'
-Plug 'hrsh7th/compe'
-" LSPInstall 
-" tsserver
-
-" Debugging
-Plug 'puremourning/vimspector'
-Plug 'szw/vim-maximizer'
-
-" telescope
-Plug 'nvim-telescope/telescope.nvim'
-Plug 'nvim-lua/popup.nvim'
-Plug 'nvim-lua/plenary.nvim'
-Plug 'nvim-telescope/telescope-fzy-native.nvim'
-Plug 'colepeters/spacemacs-theme.vim'
-
-" Autocomplete
-" Plug 'Valloric/YouCompleteMe'
-
-" More stuff
-Plug 'vim-airline/vim-airline'
-Plug 'tpope/vim-fugitive'
-Plug 'luochen1990/rainbow'
-Plug 'mattn/emmet-vim'
-
-" Nerdtree
-"Plug 'preservim/nerdtree'
-"Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
-"Plug 'Xuyuanp/nerdtree-git-plugin'
-"Plug 'preservim/nerdcommenter'
-"Plug 'PhilRunninger/nerdtree-buffer-ops'
-"Plug 'ryanoasis/vim-devicons'
-
-" CSS
-Plug 'ap/vim-css-color'
-
-" syntax highlighting
-Plug 'pangloss/vim-javascript'
-Plug 'HerringtonDarkholme/yats.vim'
-Plug 'MaxMEllon/vim-jsx-pretty'
-Plug 'posva/vim-vue'
-Plug 'kevinoid/vim-jsonc'
-" Plug 'yuezk/vim-js'
-
-" Colorschemes
-Plug 'gruvbox-community/gruvbox'
-Plug 'haishanh/night-owl.vim'
-Plug 'NLKNguyen/papercolor-theme'
-Plug 'ayu-theme/ayu-vim'
-Plug 'sonph/onehalf', {'rtp': 'vim'}
-
-" Prettier
-Plug 'sbdchd/neoformat' 
-
-call plug#end()
+source $HOME/.config/nvim/modules/plugins.vim
+source $HOME/.config/nvim/settings/sets.vim
+source $HOME/.config/nvim/themes/themes.vim
+source $HOME/.config/nvim/modules/basic-remaps.vim
 
 
 
 
 
+
+
+""" STYLES
 
 
 
@@ -69,6 +18,58 @@ call plug#end()
 """ CONFIG
 " telescope
 lua require('custom')
+
+
+
+" LSP's
+lua << EOF
+require('lspconfig').tsserver.setup{}
+
+require'compe'.setup {
+  enabled = true;
+  autocomplete = true;
+  debug = false;
+  min_length = 1;
+  preselect = 'enable';
+  throttle_time = 80;
+  source_timeout = 200;
+  incomplete_delay = 400;
+  max_abbr_width = 100;
+  max_kind_width = 100;
+  max_menu_width = 100;
+  documentation = false;
+
+  source = {
+    path = true;
+    buffer = true;
+    calc = true;
+    vsnip = true;
+    nvim_lsp = true;
+    nvim_lua = true;
+    spell = true;
+    tags = true;
+    snippets_nvim = true;
+    treesitter = true;
+  };
+}
+
+local t = function(str)
+  return vim.api.nvim_replace_termcodes(str, true, true, true)
+end
+_G.s_tab_complete = function()
+  if vim.fn.pumvisible() == 1 then
+    return t "<C-p>"
+  elseif vim.fn.call("vsnip#jumpable", {-1}) == 1 then
+    return t "<Plug>(vsnip-jump-prev)"
+  else
+    return t "<S-Tab>"
+  end
+end
+
+vim.api.nvim_set_keymap("s", "<Tab>", "v:lua.tab_complete()", {expr = true})
+vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
+vim.api.nvim_set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
+EOF
 
 " emmet
 let g:user_emmet_install_global = 0
@@ -83,6 +84,20 @@ let g:vimspector_install_gadgets = ['vscode-node-debug2', 'debugpy', 'local-lua-
 fun! GotoWindow(id)
   call win_gotoid(a:id)
 endfun
+
+" coc config
+let g:coc_global_extensions = [
+ \ 'coc-snippets',
+ \ 'coc-pairs',
+ \ 'coc-tsserver',
+ \ 'coc-eslint',
+ \ 'coc-prettier',
+ \ 'coc-json',
+ \ 'coc-yaml',
+ \ 'coc-styled-components',
+ \ 'coc-vetur',
+ \ ]
+" :CocCommand snippets.editSnippets
 
 " prettier
 " command! Prettier CocCommand prettier.formatFile 
@@ -115,16 +130,6 @@ endfunc
 " show highlight group
 nmap <leader>hlg :call <SID>SynStack()<CR>
 
-" LSP Config
-lua << EOF
-  require'lspconfig'.tsserver.setup{}
-  require'lspconfig'.vuels.setup{}
-  require'lspconfig'.html.setup{}
-  require'lspconfig'.graphql.setup{}
-  require'lspconfig'.dockerls.setup{}
-  require'lspconfig'.cssls.setup{}
-  require'lspconfig'.jsonls.setup{}
-EOF
 
 
 
@@ -138,71 +143,6 @@ EOF
 
 
 
-
-""" STYLES
-
-
-
-fun! CustomizeTheme(theme) abort
-  highlight htmlArg gui=italic,bold cterm=italic,bold
-  highlight Comment gui=italic cterm=italic
-
-  if a:theme == 'dark'
-    " hardcoded links to gruvbox theme
-    highlight jsFunction gui=italic cterm=italic ctermfg=108 guifg=#8ec07c
-    highlight Type cterm=italic,bold gui=italic,bold 
-    highlight! link Type GruvboxYellow
-    highlight! link jsObjectKey None
-    highlight! link jsObjectShorthandProp GruvboxAqua
-
-  elseif a:theme == 'light'
-    highlight Type cterm=italic,bold gui=italic,bold 
-    highlight jsFunction gui=italic cterm=italic 
-    highlight! link jsFunction Number
-    highlight! link jsFuncCall Special
-    highlight! link jsonKeyword StorageClass
-    highlight! link jsonString String 
-    highlight! link jsObjectShorthandProp Special
-    highlight! link jsObjectProp Exception
-    highlight! link jsOperatorKeyword Exception
-  endif
-endfun
-
-fun! DarkScheme()
-  set background=dark
-  let g:gruvbox_contrast_dark = 'hard'
-  let g:gruvbox_invert_selection='0'
-
-  colorscheme gruvbox
-
-  highlight ColorColumn ctermbg=0 guibg=#333333
-  highlight LineNr guifg=#555555
-  
-  " italics
-  let g:gruvbox_italic='1'
-  call CustomizeTheme('dark')
-endfun
-
-fun! LightScheme() 
-  set background=light
-  colorscheme ayu
-
-  let g:airline_theme='onehalflight'
-  highlight Normal guibg=#ffffff ctermbg=white ctermfg=white
-  highlight ColorColumn ctermbg=0 guibg=#f3f3f3
-  highlight LineNr guifg=#d5d5d5
-
-  call CustomizeTheme('light')
-endfun
-
-set termguicolors
-if exists('+termguicolors')
-  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-endif
-
-let ayucolor="light"
-call DarkScheme()
 
 
 
@@ -215,53 +155,6 @@ let g:rainbow_active = 0
 
 
 
-""" SETS
-
-" editor settings
-set scrolloff=8
-set wrap
-set number
-set relativenumber
-set colorcolumn=80
-set signcolumn=yes
-set cmdheight=3
-set guifont=Operator_Mono:h14
-set formatoptions-=ro
-
-" cursor
-set guicursor=n:block
-set guicursor+=o-r:hor50
-set guicursor+=v:hor10
-set guicursor+=i:ver10
-set guicursor+=a:blinkon50-blinkoff50
-
-set nohlsearch
-set incsearch
-" set smartcase
-set ignorecase
-
-set hidden
-set noerrorbells
-
-" text formatting
-set tabstop=2 softtabstop=2
-set smarttab
-set shiftwidth=2
-set expandtab
-set cindent
-
-" adds these characters to 'filename searches'
-set isfname+=@-@
-
-" buffer management
-set noswapfile
-set nobackup
-set updatetime=50
-set undodir=~/.vim/undodir
-set undofile
-
-" don't give |ins-completion-menu| messages.
-set shortmess+=c
 
 
 
@@ -272,70 +165,7 @@ set shortmess+=c
 
 """"" REMAPS
 
-let mapleader = " "
-
-" window management
-nnoremap <leader>xh :Vex<CR>
-nnoremap <leader>xv :Sex<CR>
-nnoremap <leader>xx :Ex<CR>
 nnoremap <leader>m :MaximizerToggle!<CR>
-
-
-" Buffer Navigation
-nnoremap <silent><expr> j (v:count == 0 ? 'gj' : 'j')
-nnoremap <silent><expr> k (v:count == 0 ? 'gk' : 'k')
-
-
-
-
-" Utils
-" source vimrc
-nnoremap <leader><CR> :so ~/.config/nvim/init.vim<CR>
-" open vimrc
-nnoremap <leader>vrc :e $MYVIMRC<CR>
-" Command Line
-nnoremap <leader>. :!
-
-" open brackets on enter 
-fun! GetCharacters() abort
-  let l:pairs = getline(".")[col(".")-2:col(".")-1] 
-  if pairs == "{}"
-    return 1
-  elseif pairs == "[]" 
-    return 1
-  elseif pairs == "()"
-    return 1
-  elseif pairs == "><"
-    return 1
-  elseif pairs == "``"
-    return 1
-  else
-    return 0
-  endif
-endfun
-inoremap <expr> <cr> GetCharacters() ? "<cr><esc>O" : "<cr>"
-
-
-" Lists
-" marks
-nnoremap <leader>lm :marks<CR>:q
-" quickfix
-nnoremap <leader>lq :copen<CR>
-" registers
-nnoremap <leader>lr :reg<CR>:q
-" buffers
- 
-
- 
-" Quick fix navigation
-nnoremap <silent> <C-j> :cnext<CR>
-nnoremap <silent> <C-k> :cprev<CR>
-
-" searching
-nnoremap <leader>hs :set hlsearch!<CR>
-
-
-
 
 " Telescope
 
@@ -359,14 +189,15 @@ nnoremap <leader>ph :lua require('telescope.builtin').help_tags()<CR>
 "nmap <silent> <leader>gr <Plug>(coc-references)
 
 " LSP remaps
-nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<CR>
-nnoremap <silent> gD <cmd>lua vim.lsp.buf.declaration()<CR>
-nnoremap <silent> gr <cmd>lua vim.lsp.buf.references()<CR>
-nnoremap <silent> gi <cmd>lua vim.lsp.buf.implementation()<CR>
-nnoremap <silent> K <cmd>lua vim.lsp.buf.hover()<CR>
-nnoremap <silent> <C-k> <cmd>lua vim.lsp.buf.signature_help()<CR>
-nnoremap <silent> <C-n> <cmd>lua vim.lsp.diagnostic.goto_prev()<CR>
-nnoremap <silent> <C-p> <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
+nmap <silent> <leader>gd :lua vim.lsp.buf.definition()<CR>
+nmap <silent> <leader>gD :lua vim.lsp.buf.declaration()<CR>
+nmap <silent> <leader>gr :lua vim.lsp.buf.references()<CR>
+nmap <silent> <leader>gt :lua vim.lsp.buf.type_definition()<CR>
+nmap <silent> <leader>gi :lua vim.lsp.buf.implementation()<CR>
+nnoremap <silent> K :lua vim.lsp.buf.hover()<CR>
+nnoremap <silent> <C-k> :lua vim.lsp.buf.signature_help()<CR>
+" nnoremap <silent> <C-n> <cmd>lua vim.lsp.diagnostic.goto_prev()<CR>
+" nnoremap <silent> <C-p> <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
 
 
 " NerdTree
@@ -374,24 +205,6 @@ nnoremap <C-t> :NERDTreeToggle<CR>
 nnoremap <C-f> :NERDTreeFind<CR>
 nnoremap <leader>n :NERDTreeFocus<CR>
 
-
-
-" Yanking and Deleting remaps
-"    "+ yanks into macOS copy register
-nnoremap <leader>y "+y
-vnoremap <leader>y "+y
-" yank the whole file into + register
-nnoremap <leader>Y gg"+yG
-" delete marked word without putting it to current register
-vnoremap <leader>p "_dP
-" paste from clipboard
-nnoremap <leader>cp "+p
-" delete a whole block
-nnoremap <leader>db 0f{V%d
-" highlight a whole block
-nnoremap <leader>vb 0f{V%
-" yank a whole block
-nnoremap <leader>yb 0f{V%y
 
 
 
@@ -404,24 +217,11 @@ nnoremap <leader>csl :call LightScheme()<CR>
 " Git
 nnoremap <leader>gf :diffget //2<CR>
 nnoremap <leader>gj :diffget //3<CR>
-nnoremap <leader>gs :G<CR>
+nnoremap <leader>gs :G<CR>5j
 nnoremap <leader>ga :G add
 nnoremap <leader>gc :G commit -m "
 nnoremap <leader>gp :G push 
 " note: dv on Git Status file to open merge resolver
-
-" KILL THOSE ARROWS
-noremap <Up> <nop>
-noremap <Down> <nop>
-noremap <Left> <nop>
-noremap <Right> <nop>
-inoremap <Up> <nop>
-inoremap <Down> <nop>
-inoremap <Left> <nop>
-inoremap <Right> <nop>
-
-
-
 
 
 
